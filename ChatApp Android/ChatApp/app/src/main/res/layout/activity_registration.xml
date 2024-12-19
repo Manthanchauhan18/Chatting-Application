@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.RegistrationActivity">
+
+
+        <ImageView
+            android:id="@+id/ivTopLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/login_top_left"/>
+
+        <TextView
+            android:id="@+id/tvCreateNewAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivTopLeft"
+            android:text="Create new Account"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="30dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvFullname"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvCreateNewAccount"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp">
+
+            <EditText
+                android:id="@+id/etFullname"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:drawableLeft="@drawable/baseline_person_24"
+                android:padding="10dp"
+                android:hint="Full Name"
+                android:inputType="text"
+                android:drawablePadding="10dp"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvPassword"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvEmail"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp">
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:drawableLeft="@drawable/baseline_vpn_key_24"
+                android:padding="10dp"
+                android:hint="Password"
+                android:drawablePadding="10dp"
+                android:inputType="textPassword"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvStatus"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvPassword"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp">
+
+            <EditText
+                android:id="@+id/etStatus"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:drawableLeft="@drawable/baseline_chat_bubble_outline_24"
+                android:padding="10dp"
+                android:hint="Status"
+                android:drawablePadding="10dp"
+                android:inputType="text"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvEmail"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvFullname"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp">
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:drawableLeft="@drawable/baseline_email_24"
+                android:padding="10dp"
+                android:hint="Email"
+                android:drawablePadding="10dp"
+                android:inputType="textEmailAddress"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvMobile"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvPassword"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="10dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etMobile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:drawableLeft="@drawable/baseline_phone_android_24"
+                android:padding="10dp"
+                android:hint="Mobile"
+                android:drawablePadding="10dp"
+                android:inputType="number"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvSignin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cvStatus"
+            app:layout_constraintBottom_toTopOf="@id/tvLogin"
+            android:layout_marginEnd="20dp">
+
+            <ImageView
+                android:id="@+id/ivCreate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_arrow_forward_24"
+                android:padding="10dp"
+                app:tint="@color/black" />
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tvCreate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/cvSignin"
+            app:layout_constraintTop_toTopOf="@id/cvSignin"
+            app:layout_constraintBottom_toBottomOf="@id/cvSignin"
+            android:text="Create"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginEnd="10dp"/>
+
+        <TextView
+            android:id="@+id/tvLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="have an account? Login"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="50dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@drawable/login_bottom_left"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
