@@ -127,27 +127,27 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cvMobile"
+            android:id="@+id/cvSelectImage"
             android:layout_width="0dp"
             android:layout_height="50dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cvPassword"
+            app:layout_constraintTop_toBottomOf="@id/cvStatus"
             android:layout_marginHorizontal="40dp"
             android:layout_marginTop="20dp"
             app:cardCornerRadius="10dp"
-            android:visibility="gone">
+            app:cardBackgroundColor="#2c3e50">
 
-            <EditText
+            <TextView
                 android:id="@+id/etMobile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@null"
-                android:drawableLeft="@drawable/baseline_phone_android_24"
                 android:padding="10dp"
-                android:hint="Mobile"
-                android:drawablePadding="10dp"
-                android:inputType="number"/>
+                android:text="Select Image"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                android:drawablePadding="10dp"/>
 
         </androidx.cardview.widget.CardView>
 
@@ -157,7 +157,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cvStatus"
+            app:layout_constraintTop_toBottomOf="@id/cvSelectImage"
             app:layout_constraintBottom_toTopOf="@id/tvLogin"
             android:layout_marginEnd="20dp">
 

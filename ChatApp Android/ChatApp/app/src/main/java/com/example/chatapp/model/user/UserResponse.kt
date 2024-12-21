@@ -10,6 +10,7 @@ data class UserResponseItem(
     val createdAt: String,
     val email: String,
     val fullname: String,
+    val profileImage: String,
     val status: String,
     val password: String,
     val salt: String,

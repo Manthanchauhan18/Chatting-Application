@@ -1,5 +1,6 @@
 const {Schema , model} = require('mongoose')
-const { randomBytes, createHmac } = require('crypto')
+const { randomBytes, createHmac } = require('crypto');
+const { type } = require('os');
 
 const userSchema = new Schema({
     fullname : {
@@ -21,6 +22,9 @@ const userSchema = new Schema({
     status: {
         type: String,
         require: true
+    },
+    profileImage:{
+        type: String
     }
 },{timestamps: true})
 

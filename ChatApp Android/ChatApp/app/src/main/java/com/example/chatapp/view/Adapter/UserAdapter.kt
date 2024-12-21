@@ -4,9 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ChatHomeRvBinding
 import com.example.chatapp.model.user.UserResponseItem
+import com.example.chatapp.utils.Constants
 
 class UserAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
@@ -33,11 +35,8 @@ class UserAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder){
             with(userList[position]){
-//                val fullUrl = "${Constants.BASE_URL}${this.blogImage}"
-//                Glide.with(holder.itemView.context)
-//                    .load(fullUrl)
-//                    .placeholder(R.drawable.ic_launcher_background)
-//                    .into(binding!!.ivBlog);
+                val fullUrl = "${Constants.BASE_URL}${this.profileImage}"
+                Glide.with(holder.itemView).load(fullUrl).placeholder(R.drawable.profile).into(binding!!.ivUserProfile)
                 binding!!.tvUserName.setText(this.fullname)
                 binding!!.tvStatus.setText(this.status)
                 binding!!.clUser.setOnClickListener{

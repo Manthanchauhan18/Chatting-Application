@@ -9,13 +9,16 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityMainBinding
 import com.example.chatapp.model.chat.Chat
 import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.network.SocketIOManager
+import com.example.chatapp.utils.Constants
 import com.example.chatapp.view.Adapter.ChatAdapter
 import com.example.chatapp.view.Adapter.UserAdapter
 import com.example.chatapp.view.viewModels.ChatViewModel
@@ -44,14 +47,19 @@ class MainActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOnCli
         binding.swiperefresh.isRefreshing = true
         chatViewModel = ChatViewModel()
         userAdapter = UserAdapter(this@MainActivity)
+
         val preferences = getSharedPreferences("LogedInPrefrance", MODE_PRIVATE)
         val userName = preferences.getString("userName", "")
+        binding.tvUsername.text = userName
+
         userId = preferences.getString("userId", "")!!
+        val userProfileImage = preferences.getString("userProfileImage", "")!!
+        val fullUrl = "${Constants.BASE_URL}${userProfileImage}"
+        Glide.with(this@MainActivity).load(fullUrl).placeholder(R.drawable.profile).into(binding.ivUserProfile)
 
         setOnClickListener()
         getChatUsers()
 
-        binding.tvUsername.text = userName
 
         binding.swiperefresh.setOnRefreshListener {
             getChatUsers()

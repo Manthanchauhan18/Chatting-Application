@@ -24,7 +24,7 @@ async function handleCreateChat(req, res){
             message
         }).then(data => {
             console.log(data)
-            return res.status(200).json({message: "Sent successful"})
+            return res.status(200).json(data)
         }).catch(err => {
             return res.status(400).json({error: err.message})
         })
@@ -60,8 +60,36 @@ async function handleGetChatByUser(req, res){
     return res.status(200).json(users)
 }
 
+async function handleDeleteChatMessages(req, res){
+    const messageList = req.body
+    console.log(messageList)
+    if (messageList && messageList.length > 0) {
+        try {
+            // for (const element of messageList) {
+                // const messId = element._id;
+                // await chatModel.findByIdAndDelete(messId);
+            // }
+
+            await messageList.forEach(async element => {
+                console.log(element)
+                const messId = element._id;
+                await chatModel.findByIdAndDelete(messId);
+            });
+            
+            return res.status(200).json({ message: "Messages deleted successfully" });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Error deleting messages", error: error.message });
+        }
+    } else {
+        return res.status(400).json({ message: "No messages provided to delete" });
+    } 
+    
+}
+
 module.exports = {
     handleGetChat,
     handleCreateChat,
-    handleGetChatByUser
+    handleGetChatByUser,
+    handleDeleteChatMessages
 }

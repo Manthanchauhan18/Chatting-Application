@@ -1,13 +1,11 @@
 package com.example.chatapp.view.Adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatapp.R
 import com.example.chatapp.databinding.MessageLayoutBinding
-import com.example.chatapp.model.chat.Chat
 import com.example.chatapp.model.chat.ChatResponseItem
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -18,7 +16,7 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
     val messageList = ArrayList<ChatResponseItem>()
     var userId = ""
     val TAG = "ChatAdapter"
-
+    private var selectedMessage = ArrayList<ChatResponseItem>()
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         var binding: MessageLayoutBinding? = null
         init {
@@ -63,6 +61,32 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
                     }
 
                 }
+                binding!!.clMessage.setOnLongClickListener {
+                    selectedMessage.add(this)
+                    itemOnClickListener.itemOnLongClickListener(selectedMessage)
+                    notifyDataSetChanged()
+                    true
+                }
+                if(selectedMessage.isNotEmpty()){
+                    binding!!.clMessage.setOnClickListener {
+                        if(selectedMessage.isNotEmpty()) {
+                            if (selectedMessage.contains(this)) {
+                                selectedMessage.remove(this)
+                            } else {
+                                selectedMessage.add(this)
+                            }
+                            itemOnClickListener.itemOnLongClickListener(selectedMessage)
+                            notifyDataSetChanged()
+                        }
+                    }
+
+                }
+                if (selectedMessage.contains(this)){
+                    // You can change the background color or any UI element to indicate selection
+                    binding!!.clMessage.setBackgroundColor(holder.itemView.resources.getColor(R.color.selected_message_background))
+                } else {
+                    binding!!.clMessage.setBackgroundColor(holder.itemView.resources.getColor(R.color.default_message_background))
+                }
             }
         }
     }
@@ -90,8 +114,17 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
         notifyDataSetChanged()
     }
 
+    fun clearSelection() {
+        selectedMessage.clear()
+        notifyDataSetChanged()
+    }
+
+    fun isMessageSelected(): Boolean {
+        return selectedMessage.isEmpty()
+    }
+
     interface ItemOnClickListener{
-        fun itemOnClickListener(item: Chat)
+        fun itemOnLongClickListener(item: ArrayList<ChatResponseItem>)
     }
 
 }

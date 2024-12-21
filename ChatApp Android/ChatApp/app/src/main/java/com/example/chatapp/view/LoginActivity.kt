@@ -115,6 +115,7 @@ class LoginActivity : AppCompatActivity(), OnClickListener {
                     editor.putBoolean("LoggedIn", true)
                     editor.putString("userId", it._id)
                     editor.putString("userName", it.fullname)
+                    editor.putString("userProfileImage", it.profileImage)
                     editor.commit()
                 },2000)
             })
