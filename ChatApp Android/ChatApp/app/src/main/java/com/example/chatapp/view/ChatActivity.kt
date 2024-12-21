@@ -1,24 +1,30 @@
 package com.example.chatapp.view
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityChatBinding
-import com.example.chatapp.model.chat.Chat
 import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.network.SocketIOManager
+import com.example.chatapp.utils.Constants
 import com.example.chatapp.view.Adapter.ChatAdapter
 import com.example.chatapp.view.viewModels.ChatViewModel
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
+
 class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.MessageReceivedListener,
-    ChatAdapter.ItemOnClickListener {
+    ChatAdapter.ItemOnClickListener , SocketIOManager.DeleteMessageListener{
 
     private lateinit var binding: ActivityChatBinding
     private var intentData: UserResponseItem?= null
@@ -28,6 +34,7 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
     var userId = ""
 
     val chatList = ArrayList<ChatResponseItem>()
+    val selectedMessagesList = ArrayList<ChatResponseItem>()
 
     val TAG = "ChatActivity"
 
@@ -44,13 +51,15 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
 
         intentData = intent.getSerializableExtra("user") as UserResponseItem?
         binding.tvUsername.setText(intentData!!.fullname)
-        socketIOManager = SocketIOManager(this@ChatActivity)
 
         val preferences = getSharedPreferences("LogedInPrefrance", MODE_PRIVATE)
         val userName = preferences.getString("userName", "")
         userId = preferences.getString("userId", "")!!
 
-        socketIOManager = SocketIOManager(this@ChatActivity)
+        val fullUrl = "${Constants.BASE_URL}${intentData!!.profileImage}"
+        Glide.with(this@ChatActivity).load(fullUrl).placeholder(R.drawable.profile).into(binding.ivUserProfile)
+
+        socketIOManager = SocketIOManager(this@ChatActivity, this@ChatActivity)
         socketIOManager.connectSocket()
         socketIOManager.loginUser(userId!!, userName!!)
 
@@ -66,6 +75,7 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
 
     private fun getChat() {
         chatViewModel.getChat(userId!!, intentData!!._id).observe(this@ChatActivity){
+            chatList.clear()
             chatList.addAll(it)
             setRecyclerview()
         }
@@ -75,6 +85,7 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         binding.apply {
             ivBackArrow.setOnClickListener(this@ChatActivity)
             ivSend.setOnClickListener(this@ChatActivity)
+            ivMenu.setOnClickListener(this@ChatActivity)
         }
     }
 
@@ -84,37 +95,96 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
                 onBackPressedDispatcher.onBackPressed()
             }
             R.id.ivSend -> {
-                sendMessage()
+                if(binding.etMessage.text.toString().isNotEmpty()){
+                    sendMessage()
+                }
             }
+            R.id.ivMenu -> {
+                showMenuPopUp(binding.ivMenu)
+            }
+        }
+    }
+
+    private fun showMenuPopUp(view: View) {
+        val popupMenu = PopupMenu(this@ChatActivity, view)
+        menuInflater.inflate(R.menu.chat_menu, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menuCopy -> {
+                    copyTextFromSelectedMess()
+                    true
+                }
+                R.id.menuDelete -> {
+                    if(!chatAdapter.isMessageSelected()) {
+                        deleteMessages()
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Show the popup menu
+        popupMenu.show()
+    }
+
+    private fun deleteMessages() {
+        if(!selectedMessagesList.isEmpty()){
+            chatViewModel.deleteMessages(selectedMessagesList).observe(this@ChatActivity){
+                Log.e(TAG, "deleteMessages: ${it}", )
+                if(it.has("message")){
+                    socketIOManager.messageDeleted(userId,intentData!!._id)
+                    chatAdapter.clearSelection()
+                    getChat()
+                }
+            }
+        }
+
+    }
+
+    private fun copyTextFromSelectedMess() {
+        if(!chatAdapter.isMessageSelected()){
+            var selectMess = ""
+            for(chat in selectedMessagesList){
+                selectMess += chat.message
+                selectMess += "\n\n"
+            }
+            Log.e(TAG, "copyTextFromSelectedMess: ${selectMess}", )
+            val clipboard: ClipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("copy", selectMess.trim())
+            Log.e(TAG, "copyTextFromSelectedMess: ${clip}", )
+            clipboard.setPrimaryClip(clip)
+            chatAdapter.clearSelection()
         }
     }
 
     private fun sendMessage() {
         binding.etMessage.clearFocus()
         val message = binding.etMessage.text.toString().trim()
-        socketIOManager.sendMessage(message, userId!!, intentData!!._id)
         val jsonObject = JsonObject()
         jsonObject.addProperty("to", intentData!!._id)
         jsonObject.addProperty("from", userId)
         jsonObject.addProperty("message", message)
         chatViewModel.sendChat(jsonObject).observe(this@ChatActivity){
-//            Log.e(TAG, "sendMessage: ${it}", )
+//            socketIOManager.sendMessage(message, userId!!, intentData!!._id)
+            socketIOManager.sendMessage(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.updatedAt)
+            val chat = ChatResponseItem(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.updatedAt)
+            addToList(chat)
+            binding.etMessage.setText("")
         }
-
-        val chat = ChatResponseItem(0, "", "", userId, message, intentData!!._id, "")
-//        Log.e(TAG, "sendMessage: ${chat}", )
-        addToList(chat)
-
-        binding.etMessage.setText("")
     }
 
     override fun onMessageReceived(data: JSONObject) {
-//        Log.e(TAG, "onMessageReceived: ${data}", )
         val from = data.getString("from")
         val message = data.getString("message")
-//        Log.e(TAG, "onMessageReceived: ${from}, ${message}", )
+        val __v = data.getInt("__v")
+        val _id = data.getString("_id")
+        val to = data.getString("to")
+        val createdAt = data.getString("createdAt")
+        val updatedAt = data.getString("updatedAt")
         if(intentData!!._id == from){
-            val chat = ChatResponseItem(0, "", "", from, message, userId, "")
+            val chat = ChatResponseItem(__v, _id, createdAt, from, message, userId, updatedAt)
+            Log.e(TAG, "onMessageReceived: ${chat}", )
             runOnUiThread {
                 addToList(chat)
             }
@@ -122,18 +192,40 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
     }
 
     private fun addToList(chat: ChatResponseItem) {
-        chatList.add(chat)
-        setRecyclerview()
+        if (!chatList.contains(chat)) {
+            chatList.add(chat)
+            setRecyclerview()
+        }
     }
-
-    override fun itemOnClickListener(item: Chat) {
-//        Log.e(TAG, "itemOnClickListener: ${item}", )
-    }
-
 
     override fun onDestroy() {
         super.onDestroy()
         socketIOManager.disconnect()
+    }
+
+    @SuppressLint("MissingSuperCall")
+    override fun onBackPressed() {
+        Log.e(TAG, "onBackPressed: ${chatAdapter.isMessageSelected()}")
+        if (!chatAdapter.isMessageSelected()) {
+            chatAdapter.clearSelection()
+        } else {
+            onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    override fun itemOnLongClickListener(item: ArrayList<ChatResponseItem>) {
+        Log.e(TAG, "itemOnLongClickListener: ${item}")
+        selectedMessagesList.clear()
+        selectedMessagesList.addAll(item)
+    }
+
+    override fun onDeleteMessageListener(data: JSONObject) {
+        val from = data.getString("from")
+        if(intentData!!._id == from){
+            runOnUiThread {
+                getChat()
+            }
+        }
     }
 
 }

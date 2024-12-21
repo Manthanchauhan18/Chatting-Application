@@ -2,11 +2,12 @@ package com.example.chatapp.network
 
 import android.util.Log
 import com.example.chatapp.utils.Constants.SOCKET_URL
+import com.google.gson.JsonObject
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
 
-class SocketIOManager(val messageReceivedListener: MessageReceivedListener) {
+class SocketIOManager(val messageReceivedListener: MessageReceivedListener, val deleteMessageListener: DeleteMessageListener) {
 
     private lateinit var socket: Socket
     val TAG = "SocketIOManager"
@@ -26,7 +27,17 @@ class SocketIOManager(val messageReceivedListener: MessageReceivedListener) {
                 // Handle incoming message
                 if (args.isNotEmpty()) {
                     val data = args[0] as JSONObject
+                    Log.e(TAG, "data: ${data}", )
                     messageReceivedListener.onMessageReceived(data)
+                }
+            }
+            socket.on("message_deleted_by_opponent") { args ->
+                Log.e(TAG, "${args}: ", )
+                // Handle incoming message
+                if (args.isNotEmpty()) {
+                    val data = args[0] as JSONObject
+                    Log.e(TAG, "data: ${data}", )
+                    deleteMessageListener.onDeleteMessageListener(data)
                 }
             }
 //            socket.connect()
@@ -47,11 +58,16 @@ class SocketIOManager(val messageReceivedListener: MessageReceivedListener) {
     }
 
     // Send a message to the server
-    fun sendMessage(message: String, from: String, to: String) {
+    fun sendMessage(__v: Int, _id: String, createdAt: String, from: String ,message: String, to: String, updatedAt: String) {
         val jsonObject = JSONObject()
         jsonObject.put("from", from)
         jsonObject.put("to", to)
         jsonObject.put("message", message)
+        jsonObject.put("__v", __v)
+        jsonObject.put("_id", _id)
+        jsonObject.put("createdAt", createdAt)
+        jsonObject.put("updatedAt", updatedAt)
+        Log.e(TAG, "sendMessage: ${jsonObject}", )
         socket.emit("send_message", jsonObject)
     }
 
@@ -61,8 +77,18 @@ class SocketIOManager(val messageReceivedListener: MessageReceivedListener) {
         Log.e(TAG, "Socket disconnected")
     }
 
+    fun messageDeleted(from: String, to: String) {
+        val jsonObject = JSONObject()
+        jsonObject.put("from", from)
+        jsonObject.put("to", to)
+        socket.emit("message_deleted",jsonObject)
+    }
+
     interface MessageReceivedListener {
         fun onMessageReceived(data: JSONObject)
+    }
+    interface DeleteMessageListener {
+        fun onDeleteMessageListener(data: JSONObject)
     }
 
 }

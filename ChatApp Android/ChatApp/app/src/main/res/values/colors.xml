@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="selected_message_background">#D3D3D3</color>
+    <color name="default_message_background">#f4f6f6</color>
 </resources>

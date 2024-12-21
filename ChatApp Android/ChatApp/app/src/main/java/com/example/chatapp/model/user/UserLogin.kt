@@ -8,6 +8,7 @@ data class UserLogin(
     val status: String,
     val fullname: String,
     val password: String,
+    val profileImage: String,
     val salt: String,
     val updatedAt: String
 )

@@ -11,6 +11,8 @@ import com.google.gson.JsonObject
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.HttpException
 
 class UserLoginViewModel: ViewModel() {
@@ -65,9 +67,10 @@ class UserLoginViewModel: ViewModel() {
     
     val mutableLiveDataCreate = MutableLiveData<JsonObject>()
 
-    fun postUserSignup(jsonObject: JsonObject): MutableLiveData<JsonObject> {
+    fun postUserSignup(fullname: RequestBody, email: RequestBody, password: RequestBody, status: RequestBody, profileImage: MultipartBody.Part?): MutableLiveData<JsonObject> {
 
-        compositeDisposable.addAll(ApiInstance.apiInterface.postUserSignup(jsonObject)
+        Log.e(TAG, "postUserSignup: ${status}, ${profileImage}", )
+        compositeDisposable.addAll(ApiInstance.apiInterface.postUserSignup(fullname, email, password, status, profileImage)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ response -> onResponseCreate(response)} , { failure -> onFailureCreate(failure)})

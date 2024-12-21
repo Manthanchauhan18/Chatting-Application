@@ -4,6 +4,7 @@ const socketIo = require('socket.io')
 const userRouter = require('./routes/user')
 const chatRouter = require('./routes/chat')
 const conntectMongoDb = require('./connection')
+const path = require('path')
 
 const app = express()
 const PORT = 9000
@@ -30,18 +31,34 @@ io.on('connection', (socket) => {
 
     socket.on("send_message", (data) => {
         console.log(data)
-        // console.log(users)
-        // const reciptent = users.find((user) => user.userId === data.to)
-        // console.log("reciptent",reciptent)
-        
         const reciptent = users[data.to]
         console.log(reciptent)
 
         if(reciptent){
-            // console.log(reciptent.userId)
             io.to(reciptent.socketId).emit('received_message', {
+                __v: data.__v,
+                _id: data._id,
+                to: data.to,
                 from: data.from,
-                message: data.message
+                message: data.message,
+                createdAt: data.createdAt,
+                updatedAt: data.updatedAt
+            })
+        }else {
+            console.log('Recipient not found.');
+            // Optionally send an error message to the sender
+        }
+    })
+
+    socket.on("message_deleted", (data) => {
+        console.log(data)
+        const reciptent = users[data.to]
+        console.log(reciptent)
+
+        if(reciptent){
+            io.to(reciptent.socketId).emit('message_deleted_by_opponent', {
+                from: data.from,
+                to: data.to
             })
         }else {
             console.log('Recipient not found.');
@@ -73,7 +90,7 @@ conntectMongoDb("mongodb://127.0.0.1:27017/chatApp-Android")
 // middleware
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-// app.use(express.static(path.resolve('./public')))
+app.use(express.static(path.resolve('./public')))
 
 // routes
 app.use('/user', userRouter)
