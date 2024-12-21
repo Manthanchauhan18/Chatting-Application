@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
@@ -11,13 +13,26 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityMainBinding
+import com.example.chatapp.model.chat.Chat
+import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.network.SocketIOManager
+import com.example.chatapp.view.Adapter.ChatAdapter
+import com.example.chatapp.view.Adapter.UserAdapter
+import com.example.chatapp.view.viewModels.ChatViewModel
+import com.example.chatapp.view.viewModels.UserLoginViewModel
+import io.socket.client.On.Handle
+import org.json.JSONObject
 
-class MainActivity : AppCompatActivity(), OnClickListener {
+class MainActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOnClickListener{
+//    , SocketIOManager.MessageReceivedListener {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var socketIOManager: SocketIOManager
+//    private lateinit var socketIOManager: SocketIOManager
     val TAG = "MainActivity"
+    var userId = ""
+    private lateinit var chatViewModel: ChatViewModel
+    val chatUsersList = ArrayList<UserResponseItem>()
+    lateinit var userAdapter: UserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,15 +41,40 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun init(){
-        setOnClickListener()
+        binding.swiperefresh.isRefreshing = true
+        chatViewModel = ChatViewModel()
+        userAdapter = UserAdapter(this@MainActivity)
         val preferences = getSharedPreferences("LogedInPrefrance", MODE_PRIVATE)
         val userName = preferences.getString("userName", "")
-        val userId = preferences.getString("userId", "")
+        userId = preferences.getString("userId", "")!!
+
+        setOnClickListener()
+        getChatUsers()
 
         binding.tvUsername.text = userName
 
-        socketIOManager = SocketIOManager()
-        socketIOManager.loginUser(userId!!, userName!!)
+        binding.swiperefresh.setOnRefreshListener {
+            getChatUsers()
+        }
+
+//        socketIOManager = SocketIOManager(this@MainActivity)
+//        socketIOManager.loginUser(userId!!, userName!!)
+    }
+
+    private fun getChatUsers() {
+        chatViewModel.getChatUsers(userId).observe(this@MainActivity){
+            chatUsersList.clear()
+            chatUsersList.addAll(it)
+            setRecyclerview()
+        }
+    }
+
+    private fun setRecyclerview() {
+        Handler(Looper.myLooper()!!).postDelayed({
+            binding.swiperefresh.isRefreshing = false
+            userAdapter.setList(chatUsersList)
+            binding.rvUsers.adapter = userAdapter
+        },1000)
     }
 
     private fun setOnClickListener() {
@@ -70,9 +110,19 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        socketIOManager.disconnect()
+    override fun itemClick(user: UserResponseItem) {
+        val intentChatActivity = Intent(this@MainActivity, ChatActivity::class.java)
+        intentChatActivity.putExtra("user", user)
+        startActivity(intentChatActivity)
     }
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        socketIOManager.disconnect()
+//    }
+
+//    override fun onMessageReceived(data: JSONObject) {
+//        Log.e(TAG, "onMessageReceived: ${data}", )
+//    }
 
 }

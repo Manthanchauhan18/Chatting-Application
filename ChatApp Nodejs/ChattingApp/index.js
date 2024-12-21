@@ -2,6 +2,7 @@ const express = require('express')
 const http = require('http')
 const socketIo = require('socket.io')
 const userRouter = require('./routes/user')
+const chatRouter = require('./routes/chat')
 const conntectMongoDb = require('./connection')
 
 const app = express()
@@ -76,6 +77,7 @@ app.use(express.urlencoded({extended: false}))
 
 // routes
 app.use('/user', userRouter)
+app.use('/chat', chatRouter)
 
 
 httpServer.listen(PORT , () => {console.log(`Server started on port: localhost:${PORT}`)})

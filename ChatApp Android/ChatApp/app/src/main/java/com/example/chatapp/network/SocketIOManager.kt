@@ -4,11 +4,9 @@ import android.util.Log
 import com.example.chatapp.utils.Constants.SOCKET_URL
 import io.socket.client.IO
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
 import org.json.JSONObject
-import java.net.URI
 
-class SocketIOManager {
+class SocketIOManager(val messageReceivedListener: MessageReceivedListener) {
 
     private lateinit var socket: Socket
     val TAG = "SocketIOManager"
@@ -28,13 +26,17 @@ class SocketIOManager {
                 // Handle incoming message
                 if (args.isNotEmpty()) {
                     val data = args[0] as JSONObject
-                    Log.e(TAG, "Received message: $data")
+                    messageReceivedListener.onMessageReceived(data)
                 }
             }
-            socket.connect()
+//            socket.connect()
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing socket", e)
         }
+    }
+
+    fun connectSocket(){
+        socket.connect()
     }
 
     fun loginUser(userId: String, username: String){
@@ -57,6 +59,10 @@ class SocketIOManager {
     fun disconnect() {
         socket.disconnect()
         Log.e(TAG, "Socket disconnected")
+    }
+
+    interface MessageReceivedListener {
+        fun onMessageReceived(data: JSONObject)
     }
 
 }

@@ -75,7 +75,7 @@ class NewChatActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOn
     }
 
     override fun itemClick(user: UserResponseItem) {
-        Log.e(TAG, "itemClick: ${user}", )
+//        Log.e(TAG, "itemClick: ${user}", )
         val intentChatActivity = Intent(this@NewChatActivity, ChatActivity::class.java)
         intentChatActivity.putExtra("user", user)
         startActivity(intentChatActivity)
