@@ -9,8 +9,8 @@
 
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/ivUserProfile"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -24,11 +24,11 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/ivUserProfile"
             app:layout_constraintTop_toTopOf="@id/ivUserProfile"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cvCounter"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="18dp"
+            android:layout_marginEnd="10dp"
             android:text="Manthan Chauhan"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:singleLine="true"
@@ -45,9 +45,32 @@
             app:layout_constraintBottom_toBottomOf="@id/ivUserProfile"
             android:layout_marginStart="10dp"
             android:text="Manthan Chauhan"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:singleLine="true"
             android:ellipsize="end"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="10dp"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="50dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="10"
+                android:textSize="15sp"
+                android:textColor="@color/white"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="5dp"/>
+
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

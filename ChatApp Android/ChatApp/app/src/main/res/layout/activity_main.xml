@@ -17,36 +17,37 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/clHeader"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_height="60dp"
+                    android:background="@drawable/gradiant_background"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:background="#2196f3">
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
                         android:id="@+id/ivSideMenu"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="20dp"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginStart="15dp"
                         android:src="@drawable/side_menu"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         app:tint="@color/white" />
 
                     <TextView
                         android:id="@+id/tvBlogify"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/ivSideMenu"
-                        app:layout_constraintBottom_toBottomOf="@id/ivSideMenu"
-                        android:text="Chat"
                         android:letterSpacing=".1"
-                        android:textSize="30sp"
+                        android:text="Chat"
+                        android:textColor="@color/white"
+                        android:textSize="25sp"
                         android:textStyle="bold"
-                        android:textColor="@color/white"/>
+                        app:layout_constraintBottom_toBottomOf="@id/ivSideMenu"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/ivSideMenu" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -70,10 +71,9 @@
                                 android:layout_height="match_parent">
 
                                 <androidx.recyclerview.widget.RecyclerView
-                                    android:id="@+id/rvBlogs"
+                                    android:id="@+id/rvUsers"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:paddingBottom="20dp"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintTop_toTopOf="parent"
@@ -112,38 +112,43 @@
                 android:background="@color/white"
                 android:layout_gravity="start">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/llUserDetail"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="200dp"
                     android:orientation="horizontal"
-                    android:paddingTop="60dp"
-                    android:paddingBottom="10dp"
                     android:paddingHorizontal="10dp"
-                    android:background="#2196f3">
+                    android:background="@drawable/gradiant_background">
 
                     <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/ivUserProfile"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:src="@drawable/profile"/>
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:src="@drawable/profile"
+                        android:layout_margin="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
                     <TextView
                         android:id="@+id/tvUsername"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
                         android:ellipsize="end"
                         android:letterSpacing="0.05"
                         android:maxLines="2"
                         android:text="User name"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toEndOf="@id/ivUserProfile"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@id/ivUserProfile"
+                        app:layout_constraintTop_toTopOf="@id/ivUserProfile"/>
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
                     android:id="@+id/miProfile"

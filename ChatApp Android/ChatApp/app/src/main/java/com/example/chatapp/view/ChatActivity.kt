@@ -9,19 +9,25 @@ import androidx.databinding.DataBindingUtil
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityChatBinding
 import com.example.chatapp.model.chat.Chat
+import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.network.SocketIOManager
+import com.example.chatapp.view.Adapter.ChatAdapter
+import com.example.chatapp.view.viewModels.ChatViewModel
 import com.google.gson.JsonObject
-import io.socket.client.Socket
 import org.json.JSONObject
 
-class ChatActivity : AppCompatActivity(), OnClickListener {
+class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.MessageReceivedListener,
+    ChatAdapter.ItemOnClickListener {
 
     private lateinit var binding: ActivityChatBinding
     private var intentData: UserResponseItem?= null
     private lateinit var socketIOManager: SocketIOManager
-//    private lateinit var socket: Socket
-    val chatList = ArrayList<Chat>()
+    lateinit var chatAdapter: ChatAdapter
+    lateinit var chatViewModel: ChatViewModel
+    var userId = ""
+
+    val chatList = ArrayList<ChatResponseItem>()
 
     val TAG = "ChatActivity"
 
@@ -32,16 +38,37 @@ class ChatActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun init(){
+        chatAdapter = ChatAdapter(this@ChatActivity)
+        chatViewModel = ChatViewModel()
         setOnClickListener()
+
         intentData = intent.getSerializableExtra("user") as UserResponseItem?
         binding.tvUsername.setText(intentData!!.fullname)
-        socketIOManager = SocketIOManager()
-//        socket.on("received_message") { args ->
-//            if (args.isNotEmpty()) {
-//                val data = args[0] as JSONObject
-//                Log.d("SocketIO", "Received message: $data")
-//            }
-//        }
+        socketIOManager = SocketIOManager(this@ChatActivity)
+
+        val preferences = getSharedPreferences("LogedInPrefrance", MODE_PRIVATE)
+        val userName = preferences.getString("userName", "")
+        userId = preferences.getString("userId", "")!!
+
+        socketIOManager = SocketIOManager(this@ChatActivity)
+        socketIOManager.connectSocket()
+        socketIOManager.loginUser(userId!!, userName!!)
+
+        getChat()
+        setRecyclerview()
+
+    }
+
+    private fun setRecyclerview() {
+        chatAdapter.setList(chatList,userId)
+        binding.rvChat.adapter = chatAdapter
+    }
+
+    private fun getChat() {
+        chatViewModel.getChat(userId!!, intentData!!._id).observe(this@ChatActivity){
+            chatList.addAll(it)
+            setRecyclerview()
+        }
     }
 
     private fun setOnClickListener() {
@@ -63,17 +90,50 @@ class ChatActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun sendMessage() {
-        val preferences = getSharedPreferences("LogedInPrefrance", MODE_PRIVATE)
-        val userId = preferences.getString("userId", "")!!
+        binding.etMessage.clearFocus()
         val message = binding.etMessage.text.toString().trim()
         socketIOManager.sendMessage(message, userId!!, intentData!!._id)
-        val chat = Chat(message, "12:30", "right")
-        chatList.add(chat)
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("to", intentData!!._id)
+        jsonObject.addProperty("from", userId)
+        jsonObject.addProperty("message", message)
+        chatViewModel.sendChat(jsonObject).observe(this@ChatActivity){
+//            Log.e(TAG, "sendMessage: ${it}", )
+        }
+
+        val chat = ChatResponseItem(0, "", "", userId, message, intentData!!._id, "")
+//        Log.e(TAG, "sendMessage: ${chat}", )
+        addToList(chat)
+
+        binding.etMessage.setText("")
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        socketIOManager.disconnect()
-//    }
+    override fun onMessageReceived(data: JSONObject) {
+//        Log.e(TAG, "onMessageReceived: ${data}", )
+        val from = data.getString("from")
+        val message = data.getString("message")
+//        Log.e(TAG, "onMessageReceived: ${from}, ${message}", )
+        if(intentData!!._id == from){
+            val chat = ChatResponseItem(0, "", "", from, message, userId, "")
+            runOnUiThread {
+                addToList(chat)
+            }
+        }
+    }
+
+    private fun addToList(chat: ChatResponseItem) {
+        chatList.add(chat)
+        setRecyclerview()
+    }
+
+    override fun itemOnClickListener(item: Chat) {
+//        Log.e(TAG, "itemOnClickListener: ${item}", )
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        socketIOManager.disconnect()
+    }
 
 }
