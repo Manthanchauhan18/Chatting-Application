@@ -1,5 +1,7 @@
 package com.example.chatapp.model.chat
 
+import java.io.Serializable
+
 class ChatResponse : ArrayList<ChatResponseItem>()
 
 data class ChatResponseItem(
@@ -9,5 +11,6 @@ data class ChatResponseItem(
     val from: String,
     val message: String,
     val to: String,
+    val read: Boolean,
     val updatedAt: String
-)
+): Serializable

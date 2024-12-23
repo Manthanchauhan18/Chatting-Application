@@ -86,8 +86,50 @@ async function handleGetUsers(req, res){
     return res.status(200).json(users)
 }
 
+async function handleGetUserById(req, res){
+    const userId = req.params.userId
+    await userModel.findById(userId).then(data => {
+        return res.status(200).json(data)
+    }).catch(err => {
+        return res.status(400).json({error: err.message})
+    })
+}
+
+async function handleUpdateUserProfile(req, res){
+    const userId = req.params.userId
+    const userUpdatedData = req.body
+    await userModel.findByIdAndUpdate(userId, {...userUpdatedData}).then(data => {
+        return res.status(200).json({message: "User updated"})
+    }).catch(err => {
+        return res.status(400).json({error: err.message})
+    })
+
+}
+
+async function handleUpdateUserPassword(req, res){
+    const {userId, oldPassword, newPassword} = req.body
+    // console.log(userId, oldPassword, newPassword)
+    const user = await userModel.findById(userId)
+    if(user){
+        console.log(user.email, oldPassword)
+        await userModel.matchedPasswordHashed(user.email, oldPassword).then(async data => {
+            console.log("inside check")
+            await userModel.updatePassword(user.email, newPassword).then(async data => {
+                return res.status(200).json(data)
+            }).catch(err => {
+                return res.status(400).json({error: err.message})
+            })
+        }).catch(err => {
+            return res.status(400).json({error: err.message})
+        })
+    }
+}
+
 module.exports = {
     handlePostUserLogin,
     handlePostUserRegistration,
-    handleGetUsers
+    handleGetUsers,
+    handleGetUserById,
+    handleUpdateUserProfile,
+    handleUpdateUserPassword
 }

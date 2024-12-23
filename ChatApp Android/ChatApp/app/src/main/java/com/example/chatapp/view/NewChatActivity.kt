@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.AdapterView.OnItemLongClickListener
 import androidx.databinding.DataBindingUtil
 import com.example.chatapp.R
 import com.example.chatapp.databinding.ActivityNewChatBinding
@@ -15,7 +16,7 @@ import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.view.Adapter.UserAdapter
 import com.example.chatapp.view.viewModels.UserLoginViewModel
 
-class NewChatActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOnClickListener {
+class NewChatActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOnClickListener, UserAdapter.ItemOnLongClickListener {
 
     private lateinit var binding: ActivityNewChatBinding
     private lateinit var userLoginViewModel: UserLoginViewModel
@@ -32,7 +33,7 @@ class NewChatActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOn
 
     private fun init(){
         userLoginViewModel = UserLoginViewModel()
-        userAdapter = UserAdapter(this@NewChatActivity)
+        userAdapter = UserAdapter(this@NewChatActivity, this@NewChatActivity, "NewChatActivity")
         binding.swiperefresh.isRefreshing = true
         setOnClickListener()
         getAllUser()
@@ -79,6 +80,10 @@ class NewChatActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOn
         val intentChatActivity = Intent(this@NewChatActivity, ChatActivity::class.java)
         intentChatActivity.putExtra("user", user)
         startActivity(intentChatActivity)
+    }
+
+    override fun itemOnLongClickListener(item: ArrayList<String>) {
+        Log.e(TAG, "itemOnLongClickListener: long press", )
     }
 
 

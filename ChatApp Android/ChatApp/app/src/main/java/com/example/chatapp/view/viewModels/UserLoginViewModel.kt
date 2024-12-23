@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.chatapp.model.user.UserResponse
+import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.models.user.UserLogin
 import com.example.chatapp.network.ApiInstance
 import com.google.gson.Gson
@@ -112,6 +113,84 @@ class UserLoginViewModel: ViewModel() {
     private fun onResponseAllUser(response: UserResponse) {
 //        Log.e(TAG, "onResponse: ${response}", )
         mutableLiveDataAllUser.value = response
+    }
+
+
+// -------------------------------------------------------------------------------------------------------
+
+    val mutableLiveDataGetUserById = MutableLiveData<UserResponseItem>()
+
+    fun getUserById(userId: String): MutableLiveData<UserResponseItem> {
+
+        compositeDisposable.addAll(ApiInstance.apiInterface.getUserById(userId)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response -> onResponseGetUserById(response)} , { failure -> onFailureGetUserById(failure)})
+        )
+
+        return mutableLiveDataGetUserById as MutableLiveData<UserResponseItem>
+    }
+
+    private fun onFailureGetUserById(failure: Throwable?) {
+        Log.e(TAG, "onFailure: ${failure!!.message}", )
+
+    }
+
+    private fun onResponseGetUserById(response: UserResponseItem) {
+//        Log.e(TAG, "onResponse: ${response}", )
+        mutableLiveDataGetUserById.value = response
+    }
+
+
+// -------------------------------------------------------------------------------------------------------
+
+    val mutableLiveDataUpdateUser = MutableLiveData<JsonObject>()
+
+    fun updateUser(userId: String, jsonObject: JsonObject): MutableLiveData<JsonObject> {
+
+        compositeDisposable.addAll(ApiInstance.apiInterface.updateUserById(userId, jsonObject)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response -> onResponseUpdateUser(response)} , { failure -> onFailureUpdateUser(failure)})
+        )
+
+        return mutableLiveDataUpdateUser as MutableLiveData<JsonObject>
+    }
+
+    private fun onFailureUpdateUser(failure: Throwable?) {
+        Log.e(TAG, "onFailure: ${failure!!.message}", )
+
+    }
+
+    private fun onResponseUpdateUser(response: JsonObject) {
+//        Log.e(TAG, "onResponse: ${response}", )
+        mutableLiveDataUpdateUser.value = response
+    }
+
+
+// -------------------------------------------------------------------------------------------------------
+
+    val mutableLiveDataUpdatePassword = MutableLiveData<JsonObject>()
+
+    fun updatePassword(jsonObject: JsonObject): MutableLiveData<JsonObject> {
+
+        compositeDisposable.addAll(ApiInstance.apiInterface.postChangePassword(jsonObject)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response -> onResponseUpdatePassword(response)} , { failure -> onFailureUpdatePassword(failure)})
+        )
+
+        return mutableLiveDataUpdatePassword as MutableLiveData<JsonObject>
+    }
+
+    private fun onFailureUpdatePassword(failure: Throwable?) {
+        Log.e(TAG, "onFailure: ${failure!!.message}", )
+
+    }
+
+    private fun onResponseUpdatePassword(response: JsonObject) {
+//        Log.e(TAG, "onResponse: ${response}", )
+        mutableLiveDataUpdatePassword.value = response
     }
 
 }

@@ -43,12 +43,22 @@ userSchema.pre('save', async function(next){
 userSchema.static("matchedPasswordHashed", async function(email, password){
     const user = await this.findOne({email})
     if(!user) throw new Error('Invalid username and password');
-
     const salt = user.salt
     const hashedPassword = user.password
-
     const userProvidedHash = createHmac("sha256", salt).update(password).digest('hex')
+    console.log(salt, userProvidedHash)
     if(hashedPassword !== userProvidedHash) throw new Error('Invalid password');
+    return user
+})
+
+userSchema.static("updatePassword", async function(email, newpassword){
+    const user = await this.findOne({email})
+    if(!user) throw new Error('User not found');
+    const salt = user.salt
+    const hashedPassword = createHmac("sha256", salt).update(newpassword).digest('hex')
+    user.salt = salt
+    user.password = hashedPassword
+    await user.save()
     return user
 })
 

@@ -74,7 +74,7 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
     }
 
     private fun getChat() {
-        chatViewModel.getChat(userId!!, intentData!!._id).observe(this@ChatActivity){
+        chatViewModel.getChat(userId!!, intentData!!._id, intentData!!.unreadMess).observe(this@ChatActivity){
             chatList.clear()
             chatList.addAll(it)
             setRecyclerview()
@@ -167,8 +167,8 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         jsonObject.addProperty("message", message)
         chatViewModel.sendChat(jsonObject).observe(this@ChatActivity){
 //            socketIOManager.sendMessage(message, userId!!, intentData!!._id)
-            socketIOManager.sendMessage(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.updatedAt)
-            val chat = ChatResponseItem(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.updatedAt)
+            socketIOManager.sendMessage(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.read, it.updatedAt)
+            val chat = ChatResponseItem(it.__v, it._id, it.createdAt, it.from, it.message, it.to, it.read, it.updatedAt)
             addToList(chat)
             binding.etMessage.setText("")
         }
@@ -180,13 +180,15 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         val __v = data.getInt("__v")
         val _id = data.getString("_id")
         val to = data.getString("to")
+        val read = data.getBoolean("read")
         val createdAt = data.getString("createdAt")
         val updatedAt = data.getString("updatedAt")
         if(intentData!!._id == from){
-            val chat = ChatResponseItem(__v, _id, createdAt, from, message, userId, updatedAt)
+            val chat = ChatResponseItem(__v, _id, createdAt, from, message, userId, read, updatedAt)
             Log.e(TAG, "onMessageReceived: ${chat}", )
             runOnUiThread {
-                addToList(chat)
+                getChat()
+//                addToList(chat)
             }
         }
     }
@@ -208,6 +210,7 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         Log.e(TAG, "onBackPressed: ${chatAdapter.isMessageSelected()}")
         if (!chatAdapter.isMessageSelected()) {
             chatAdapter.clearSelection()
+            binding.ivMenu.visibility = View.GONE
         } else {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -217,6 +220,9 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         Log.e(TAG, "itemOnLongClickListener: ${item}")
         selectedMessagesList.clear()
         selectedMessagesList.addAll(item)
+        if(!selectedMessagesList.isEmpty()){
+            binding.ivMenu.visibility = View.VISIBLE
+        }
     }
 
     override fun onDeleteMessageListener(data: JSONObject) {

@@ -95,7 +95,8 @@
                 app:tint="@color/white"
                 android:paddingHorizontal="5dp"
                 android:paddingVertical="10dp"
-                android:layout_marginEnd="5dp"/>
+                android:layout_marginEnd="5dp"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -111,7 +112,8 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="vertical"
             app:stackFromEnd="true"
-            tools:listitem="@layout/message_layout"/>
+            tools:listitem="@layout/message_layout"
+            android:paddingTop="5dp"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clFooter"
