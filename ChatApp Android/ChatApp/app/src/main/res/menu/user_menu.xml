@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--        <item-->
+<!--            android:id="@+id/menuCopy"-->
+<!--            android:icon="@drawable/copy"-->
+<!--            android:title="Copy"-->
+<!--            app:showAsAction="never" />-->
+
+        <item
+            android:id="@+id/menuDelete"
+            android:icon="@drawable/baseline_delete_24"
+            android:title="Delete"
+            app:showAsAction="never" />
+
+<!--        <item-->
+<!--            android:id="@+id/exit"-->
+<!--            android:icon="@drawable/ic_exit"-->
+<!--            android:title="EXIT"-->
+<!--            app:showAsAction="never" />-->
+
+</menu>

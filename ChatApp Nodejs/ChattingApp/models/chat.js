@@ -12,6 +12,10 @@ const chatSchema = new Schema({
     to: {
         type: String,
         require: true
+    },
+    read: {
+        type: Boolean,
+        default: false
     }
 },{timestamps: true})
 

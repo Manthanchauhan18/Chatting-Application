@@ -42,7 +42,8 @@ io.on('connection', (socket) => {
                 from: data.from,
                 message: data.message,
                 createdAt: data.createdAt,
-                updatedAt: data.updatedAt
+                updatedAt: data.updatedAt,
+                read: data.read
             })
         }else {
             console.log('Recipient not found.');

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.chatapp.model.chat.ChatResponse
 import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponse
+import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.models.user.UserLogin
 import com.example.chatapp.network.ApiInstance
 import com.google.gson.Gson
@@ -23,10 +24,10 @@ class ChatViewModel: ViewModel() {
 
     val TAG = "ChatViewModel"
 
-    fun getChat(from: String, to: String): MutableLiveData<ChatResponse> {
+    fun getChat(from: String, to: String, unreadMessList: ArrayList<ChatResponseItem>): MutableLiveData<ChatResponse> {
 
         compositeDisposable.addAll(
-            ApiInstance.apiInterface.getChat(from, to)
+            ApiInstance.apiInterface.getChat(from, to, unreadMessList)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ response -> onResponse(response)} , { failure -> onFailure(failure)})
@@ -193,6 +194,50 @@ class ChatViewModel: ViewModel() {
     private fun onResponseDeleteMessages(response: JsonObject) {
 //        Log.e(TAG, "onResponse: ${response}", )
         mutableLiveDataDeleteMessages.value = response
+    }
+
+//--------------------------------------------------------------------------------------------------------------
+
+    val mutableLiveDataDeleteMessagesByUser = MutableLiveData<JsonObject>()
+    val mutableLiveDataErrorDeleteMessagesByUser = MutableLiveData<String>()
+
+    fun deleteMessagesByUser(userId: String, messageList: ArrayList<String>): MutableLiveData<JsonObject> {
+
+        Log.e(TAG, "deleteMessages: ${messageList}", )
+        compositeDisposable.addAll(ApiInstance.apiInterface.postDeleteMessagesByUser(userId, messageList)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ response -> onResponseDeleteMessagesByUser(response)} , { failure -> onFailureDeleteMessagesByUser(failure)})
+        )
+
+        return mutableLiveDataDeleteMessagesByUser as MutableLiveData<JsonObject>
+    }
+
+    private fun onFailureDeleteMessagesByUser(failure: Throwable) {
+        Log.e(TAG, "onFailure: ", failure)
+        if (failure is HttpException) {
+            try {
+                val errorResponse = failure.response()?.errorBody()?.string()
+                val errorJsonObject = Gson().fromJson(errorResponse, JsonObject::class.java)
+
+                if (errorJsonObject.has("error")) {
+                    val errorMessage = errorJsonObject.get("error").asString
+                    mutableLiveDataErrorDeleteMessagesByUser.value = errorMessage
+                } else {
+                    mutableLiveDataErrorDeleteMessagesByUser.value = "An unexpected error occurred."
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error parsing error response: ", e)
+                mutableLiveDataErrorDeleteMessagesByUser.value = "An unexpected error occurred."
+            }
+        } else {
+            mutableLiveDataErrorDeleteMessagesByUser.value = "Network error or an unexpected problem occurred."
+        }
+    }
+
+    private fun onResponseDeleteMessagesByUser(response: JsonObject) {
+//        Log.e(TAG, "onResponse: ${response}", )
+        mutableLiveDataDeleteMessagesByUser.value = response
     }
 
 }

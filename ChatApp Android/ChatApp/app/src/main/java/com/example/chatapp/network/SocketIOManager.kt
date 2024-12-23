@@ -58,7 +58,7 @@ class SocketIOManager(val messageReceivedListener: MessageReceivedListener, val 
     }
 
     // Send a message to the server
-    fun sendMessage(__v: Int, _id: String, createdAt: String, from: String ,message: String, to: String, updatedAt: String) {
+    fun sendMessage(__v: Int, _id: String, createdAt: String, from: String ,message: String, to: String, read: Boolean, updatedAt: String) {
         val jsonObject = JSONObject()
         jsonObject.put("from", from)
         jsonObject.put("to", to)
@@ -67,6 +67,7 @@ class SocketIOManager(val messageReceivedListener: MessageReceivedListener, val 
         jsonObject.put("_id", _id)
         jsonObject.put("createdAt", createdAt)
         jsonObject.put("updatedAt", updatedAt)
+        jsonObject.put("read", read)
         Log.e(TAG, "sendMessage: ${jsonObject}", )
         socket.emit("send_message", jsonObject)
     }

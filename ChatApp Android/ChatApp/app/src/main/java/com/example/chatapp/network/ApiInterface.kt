@@ -4,6 +4,7 @@ import com.example.chatapp.model.chat.Chat
 import com.example.chatapp.model.chat.ChatResponse
 import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponse
+import com.example.chatapp.model.user.UserResponseItem
 import com.example.chatapp.models.user.UserLogin
 import com.google.gson.JsonObject
 import io.reactivex.Observable
@@ -14,6 +15,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
@@ -39,13 +41,23 @@ interface ApiInterface {
     @GET("/user")
     fun getAllUser(): Observable<UserResponse>
 
+    @GET("/user/{userId}")
+    fun getUserById(@Path("userId") userId: String): Observable<UserResponseItem>
+
     @GET("/chat/user/{userId}")
     fun getChatUser(@Path("userId") userId: String): Observable<UserResponse>
 
-    @GET("/chat")
+    @PATCH("/user/update/{userId}")
+    fun updateUserById(
+        @Path("userId") userId: String,
+        @Body jsonObject: JsonObject
+    ): Observable<JsonObject>
+
+    @POST("/chat")
     fun getChat(
         @Query("from") from: String,
-        @Query("to") to: String
+        @Query("to") to: String,
+        @Body unreadMessList: ArrayList<ChatResponseItem>
     ): Observable<ChatResponse>
 
     @POST("/chat/create")
@@ -54,5 +66,14 @@ interface ApiInterface {
 //    @FormUrlEncoded
     @POST("chat/deleteMessages")
     fun postDeleteMessages(@Body messageList: List<ChatResponseItem>): Observable<JsonObject>
+
+    @POST("chat/delete/{userId}")
+    fun postDeleteMessagesByUser(
+        @Path("userId") userId: String,
+        @Body messageList: List<String>
+    ): Observable<JsonObject>
+
+    @POST("user/updatePassword")
+    fun postChangePassword(@Body jsonObject: JsonObject): Observable<JsonObject>
 
 }
