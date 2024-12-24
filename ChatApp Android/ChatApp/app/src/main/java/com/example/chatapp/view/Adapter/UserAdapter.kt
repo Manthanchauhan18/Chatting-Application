@@ -38,6 +38,7 @@ class UserAdapter(var itemOnClickListener: ItemOnClickListener, var itemOnLongCl
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder){
             with(userList[position]){
+
                 if(from == "NewChatActivity"){
                     val fullUrl = "${Constants.BASE_URL}${this.profileImage}"
                     Glide.with(holder.itemView).load(fullUrl).placeholder(R.drawable.profile).into(binding!!.ivUserProfile)

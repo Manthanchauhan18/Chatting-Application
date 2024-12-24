@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.example.chatapp.model.chat.ChatResponse
 import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponse
-import com.example.chatapp.model.user.UserResponseItem
-import com.example.chatapp.models.user.UserLogin
 import com.example.chatapp.network.ApiInstance
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -24,7 +22,7 @@ class ChatViewModel: ViewModel() {
 
     val TAG = "ChatViewModel"
 
-    fun getChat(from: String, to: String, unreadMessList: ArrayList<ChatResponseItem>): MutableLiveData<ChatResponse> {
+    fun getChat(from: String, to: String, unreadMessList: ArrayList<ChatResponseItem>?): MutableLiveData<ChatResponse> {
 
         compositeDisposable.addAll(
             ApiInstance.apiInterface.getChat(from, to, unreadMessList)

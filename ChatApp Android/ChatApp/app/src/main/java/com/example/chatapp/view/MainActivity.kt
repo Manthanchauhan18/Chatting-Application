@@ -169,6 +169,7 @@ class MainActivity : AppCompatActivity(), OnClickListener, UserAdapter.ItemOnCli
     override fun itemClick(user: UserResponseItem) {
         val intentChatActivity = Intent(this@MainActivity, ChatActivity::class.java)
         intentChatActivity.putExtra("user", user)
+
         startActivity(intentChatActivity)
     }
 

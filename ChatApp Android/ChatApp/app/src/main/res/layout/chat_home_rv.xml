@@ -60,7 +60,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="20dp"
             app:cardBackgroundColor="@color/black"
-            app:cardCornerRadius="50dp">
+            app:cardCornerRadius="50dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tvUnreadCount"
