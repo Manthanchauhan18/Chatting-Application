@@ -1,5 +1,6 @@
 package com.example.chatapp.view.Adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
     var userId = ""
     val TAG = "ChatAdapter"
     private var selectedMessage = ArrayList<ChatResponseItem>()
+    var lastDate = ""
+
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         var binding: MessageLayoutBinding? = null
         init {
@@ -36,6 +39,28 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(holder){
             with(messageList[position]){
+                val currentMessageDate = getDateOnly(this.createdAt)
+//                Log.e(TAG, "onBindViewHolder: ${currentMessageDate}, ${this.message}", )
+               if(position != 0){
+                   Log.e(TAG, "onBindViewHolder: ${currentMessageDate}, ${this.message}", )
+                   if(position != messageList.size-1){
+                       val nextDate = getDateOnly(messageList[position+1].createdAt)
+                       Log.e(TAG, "onBindViewHolder: ${currentMessageDate}, ${nextDate}", )
+                       if(nextDate != currentMessageDate){
+                           binding!!.cvDateChanged.visibility = View.VISIBLE
+                           binding!!.tvDate.text = currentMessageDate
+                       }else{
+                           binding!!.cvDateChanged.visibility = View.GONE
+                       }
+                   }else{
+                       binding!!.cvDateChanged.visibility = View.GONE
+                   }
+               }else{
+                   binding!!.cvDateChanged.visibility = View.VISIBLE
+                   binding!!.tvDate.text = currentMessageDate
+               }
+
+
                 if(this.from == userId){
                     binding!!.cvReceive.visibility = View.GONE
                     binding!!.cvSend.visibility = View.VISIBLE
@@ -54,10 +79,10 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
                     binding!!.tvReceiveMessage.setText(this.message)
                     if(this.createdAt == ""){
                         val time = dateConvertNull(this.createdAt)
-                        binding!!.tvTime.setText(time)
+                        binding!!.tvReceiveTime.setText(time)
                     }else{
                         val time = dateConvert(this.createdAt)
-                        binding!!.tvTime.setText(time)
+                        binding!!.tvReceiveTime.setText(time)
                     }
 
                 }
@@ -89,6 +114,14 @@ class ChatAdapter(var itemOnClickListener: ItemOnClickListener): RecyclerView.Ad
                 }
             }
         }
+    }
+
+    private fun getDateOnly(createdAt: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+        val date = inputFormat.parse(createdAt)
+        val outputFormat = SimpleDateFormat("MMM dd, yyyy")  // Display date as "Dec 24, 2024"
+        return outputFormat.format(date)
     }
 
     private fun dateConvertNull(createdAt: String): String {

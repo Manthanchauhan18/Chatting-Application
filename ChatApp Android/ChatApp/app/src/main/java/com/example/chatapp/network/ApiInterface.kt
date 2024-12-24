@@ -1,6 +1,5 @@
 package com.example.chatapp.network
 
-import com.example.chatapp.model.chat.Chat
 import com.example.chatapp.model.chat.ChatResponse
 import com.example.chatapp.model.chat.ChatResponseItem
 import com.example.chatapp.model.user.UserResponse
@@ -11,8 +10,6 @@ import io.reactivex.Observable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -57,7 +54,7 @@ interface ApiInterface {
     fun getChat(
         @Query("from") from: String,
         @Query("to") to: String,
-        @Body unreadMessList: ArrayList<ChatResponseItem>
+        @Body unreadMessList: ArrayList<ChatResponseItem>?
     ): Observable<ChatResponse>
 
     @POST("/chat/create")

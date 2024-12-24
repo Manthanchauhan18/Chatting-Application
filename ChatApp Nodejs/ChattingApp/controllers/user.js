@@ -16,7 +16,7 @@ const upload = multer({storage: storage})
 
 async function handlePostUserLogin(req , res) {
     const {email, password} = req.body
-    console.log(email, password)
+    // console.log(email, password)
     try{
         const user = await userModel.matchedPasswordHashed(email, password)
         return res.status(200).json(user)
@@ -31,8 +31,8 @@ async function handlePostUserRegistration(req , res){
         const { fullname, email, password, status} = req.body
         const isEmailExist = await userModel.findOne({email})
         if(isEmailExist) return res.status(200).json({error: "email already registered"});
-        console.log(req.file)
-        console.log(req)
+        // console.log(req.file)
+        // console.log(req)
         try {
             if(status === "" && req.file === undefined){
                 await userModel.create({
@@ -110,19 +110,18 @@ async function handleUpdateUserPassword(req, res){
     const {userId, oldPassword, newPassword} = req.body
     // console.log(userId, oldPassword, newPassword)
     const user = await userModel.findById(userId)
-    if(user){
-        console.log(user.email, oldPassword)
+    try {
         await userModel.matchedPasswordHashed(user.email, oldPassword).then(async data => {
-            console.log("inside check")
-            await userModel.updatePassword(user.email, newPassword).then(async data => {
-                return res.status(200).json(data)
-            }).catch(err => {
-                return res.status(400).json({error: err.message})
-            })
+            user.password = newPassword
+            await user.save()
+            return res.status(200).json({message: "password updated"})
         }).catch(err => {
             return res.status(400).json({error: err.message})
         })
+    } catch (error) {
+        return res.status(400).json({error: error.message})
     }
+
 }
 
 module.exports = {

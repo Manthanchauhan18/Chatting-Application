@@ -1,14 +1,21 @@
 package com.example.chatapp.view
 
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.View.OnClickListener
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.bumptech.glide.Glide
 import com.example.chatapp.R
@@ -28,6 +35,7 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
     val TAG = "ProfileActivity"
     var selectedImageUri: Uri? = null
     var currentUser: UserResponseItem? = null
+    lateinit var loadingDialog : Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,12 +70,30 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
         binding.apply {
             cvUpdateProfile.setOnClickListener(this@ProfileActivity)
             ivEditProfile.setOnClickListener(this@ProfileActivity)
+            cvChangePassword.setOnClickListener(this@ProfileActivity)
         }
+    }
+
+    private fun showDialog() {
+        loadingDialog = Dialog(this@ProfileActivity)
+        val window: Window? = loadingDialog.window
+        window!!.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        window.setGravity(Gravity.CENTER)
+        loadingDialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
+        loadingDialog.window!!.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+        loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        loadingDialog.setCancelable(false)
+        loadingDialog.setContentView(R.layout.loading_dialogbox)
+        loadingDialog.show()
     }
 
     override fun onClick(view: View?) {
         when(view!!.id){
             R.id.cvUpdateProfile -> {
+                showDialog()
                 binding.etFullname.clearFocus()
                 binding.etStatus.clearFocus()
                 updateUserProfile()
@@ -86,6 +112,10 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
                 }else{
                     selectImageFromGallery()
                 }
+            }
+            R.id.cvChangePassword -> {
+                val intentChangePassword = Intent(this@ProfileActivity, ChangePasswordActivity::class.java)
+                startActivity(intentChangePassword)
             }
         }
     }
@@ -140,7 +170,10 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
         val fullname = binding.etFullname.text.toString().trim()
         val status = binding.etStatus.text.toString().trim()
         if(fullname.equals(currentUser!!.fullname) && status.equals(currentUser!!.status)){
-            Log.e(TAG, "updateUserProfile: please change the values which you want to update", )
+            Handler(Looper.myLooper()!!).postDelayed({
+                loadingDialog.hide()
+                Toast.makeText(this@ProfileActivity, "please change the values which you want to update", Toast.LENGTH_SHORT).show()
+            },2000)
         }else{
             if(!fullname.equals(currentUser!!.fullname) && !status.equals(currentUser!!.status)){
                 val jsonObject = JsonObject()
@@ -149,7 +182,7 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
                 updateUser(jsonObject)
             }else if(fullname.equals(currentUser!!.fullname) && !status.equals(currentUser!!.status)){
                 val jsonObject = JsonObject()
-                jsonObject.addProperty("status", fullname)
+                jsonObject.addProperty("status", status)
                 updateUser(jsonObject)
             }else if(!fullname.equals(currentUser!!.fullname) && status.equals(currentUser!!.status)){
                 val jsonObject = JsonObject()
@@ -161,7 +194,12 @@ class ProfileActivity : AppCompatActivity(), OnClickListener {
 
     private fun updateUser(jsonObject: JsonObject){
         userLoginViewModel.updateUser(userId, jsonObject).observe(this@ProfileActivity){
-            Log.e(TAG, "updateUser: ${it}", )
+            Handler(Looper.myLooper()!!).postDelayed({
+                if(it.has("message")){
+                    loadingDialog.hide()
+                    Toast.makeText(this@ProfileActivity, "User Updated Successfuly", Toast.LENGTH_SHORT).show()
+                }
+            },2000)
         }
     }
 

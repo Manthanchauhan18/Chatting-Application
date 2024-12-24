@@ -135,6 +135,9 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
                 if(it.has("message")){
                     socketIOManager.messageDeleted(userId,intentData!!._id)
                     chatAdapter.clearSelection()
+                    binding.ivMenu.visibility = View.GONE
+                    binding.ivVideoCall.visibility = View.VISIBLE
+                    binding.ivVoiceCall.visibility = View.VISIBLE
                     getChat()
                 }
             }
@@ -155,6 +158,9 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
             Log.e(TAG, "copyTextFromSelectedMess: ${clip}", )
             clipboard.setPrimaryClip(clip)
             chatAdapter.clearSelection()
+            binding.ivMenu.visibility = View.GONE
+            binding.ivVideoCall.visibility = View.VISIBLE
+            binding.ivVoiceCall.visibility = View.VISIBLE
         }
     }
 
@@ -211,6 +217,8 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         if (!chatAdapter.isMessageSelected()) {
             chatAdapter.clearSelection()
             binding.ivMenu.visibility = View.GONE
+            binding.ivVideoCall.visibility = View.VISIBLE
+            binding.ivVoiceCall.visibility = View.VISIBLE
         } else {
             onBackPressedDispatcher.onBackPressed()
         }
@@ -222,6 +230,8 @@ class ChatActivity : AppCompatActivity(), OnClickListener, SocketIOManager.Messa
         selectedMessagesList.addAll(item)
         if(!selectedMessagesList.isEmpty()){
             binding.ivMenu.visibility = View.VISIBLE
+            binding.ivVideoCall.visibility = View.GONE
+            binding.ivVoiceCall.visibility = View.GONE
         }
     }
 
